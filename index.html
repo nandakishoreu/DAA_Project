@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Interactive 0/1 Knapsack Branch and Bound visualizer for smart shopping budget optimization.">
+  <title>Cartwise — Smart Shopping Budget Optimizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#"><span class="brand-icon">C</span><span>CARTWISE<small>OPTIMIZATION LAB</small></span></a>
+  <div class="top-right"><span class="pulse"></span> DAA · ASSIGNMENT 02 <i></i> BRANCH &amp; BOUND</div>
+</header>
+<main class="container">
+  <section class="hero">
+    <div class="eyebrow"><span></span> DESIGN AND ANALYSIS OF ALGORITHMS</div>
+    <h1>Shop smarter.<br><em>Spend wiser.</em></h1>
+    <p>Build the best shopping basket without crossing your budget. Cartwise uses the 0/1 Knapsack problem and Branch and Bound to find the combination with the highest total value.</p>
+    <div class="hero-chips"><span>01 / Define budget</span><span>02 / Add products</span><span>03 / Optimize basket</span></div>
+  </section>
+
+  <section class="workspace">
+    <div class="section-head"><div><b>01</b><h2>Shopping constraints</h2></div><small>SET YOUR LIMIT</small></div>
+    <div class="budget-card">
+      <div><label for="budget">YOUR TOTAL BUDGET</label><div class="budget-input"><span>₹</span><input id="budget" type="number" min="1" value="5000"></div></div>
+      <div class="budget-tip"><span class="tip-icon">↗</span><p>Choose the maximum amount you can spend. The optimizer will find the most valuable combination within this limit.</p></div>
+    </div>
+  </section>
+
+  <section class="workspace">
+    <div class="section-head"><div><b>02</b><h2>Product catalogue</h2></div><small id="productCount">0 PRODUCTS</small></div>
+    <div class="add-card">
+      <div class="form-grid">
+        <div><label for="productName">PRODUCT NAME</label><input id="productName" placeholder="e.g. Wireless mouse" maxlength="35"></div>
+        <div><label for="productCost">COST (₹)</label><input id="productCost" type="number" min="1" placeholder="e.g. 799"></div>
+        <div><label for="productValue">VALUE / PRIORITY</label><input id="productValue" type="number" min="1" placeholder="e.g. 90"></div>
+        <button id="addBtn" class="add-button">+ ADD ITEM</button>
+      </div>
+      <p class="form-hint">Value is a score representing usefulness or priority (not the selling price). Each product can be selected only once.</p>
+    </div>
+    <div class="catalogue" id="catalogue"></div>
+    <div class="catalogue-actions"><button id="sampleBtn" class="subtle-button">↻ LOAD SAMPLE PRODUCTS</button><button id="clearBtn" class="subtle-button danger">CLEAR ALL</button></div>
+    <button id="optimizeBtn" class="solve-button">Find the best shopping basket <span>↗</span></button>
+    <p class="status" id="status">Add products and set a budget to begin.</p>
+  </section>
+
+  <section id="results" class="hidden">
+    <div class="section-head"><div><b>03</b><h2>Optimization results</h2></div><small>BEST FEASIBLE SOLUTION</small></div>
+    <div class="stats">
+      <article><label>MAXIMUM VALUE</label><strong id="bestValue">—</strong><small>Combined priority score</small></article>
+      <article><label>TOTAL SPEND</label><strong id="totalCost">—</strong><small id="remaining">—</small></article>
+      <article class="accent-stat"><label>BUDGET USED</label><strong id="budgetUsed">—</strong><small>Of your available budget</small></article>
+      <article><label>SEARCH NODES</label><strong id="nodesVisited">—</strong><small id="nodesPruned">—</small></article>
+    </div>
+    <div class="result-grid">
+      <article class="panel">
+        <div class="panel-title"><div><b>A</b><h3>Your optimized basket</h3></div><span>SELECTED ITEMS</span></div>
+        <div id="selectedItems" class="selected-items"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-title"><div><b>B</b><h3>Budget allocation</h3></div><span>SPENDING BREAKDOWN</span></div>
+        <div class="donut-wrap"><div id="donut" class="donut"><div><strong id="donutPercent">0%</strong><small>USED</small></div></div></div>
+        <div class="legend"><span><i></i> Amount spent</span><span><i></i> Budget remaining</span></div>
+      </article>
+    </div>
+    <article class="panel">
+      <div class="panel-title"><div><b>04</b><h3>Branch and Bound execution trace</h3></div><span>SEARCH + PRUNING</span></div>
+      <p class="description">The algorithm explores include/exclude decisions. It calculates an optimistic upper bound for each partial basket. If that bound cannot beat the best solution already found, the branch is pruned.</p>
+      <div class="trace-legend"><span><i class="included"></i> Include</span><span><i class="excluded"></i> Exclude</span><span><i class="pruned"></i> Pruned</span><span><i class="expanded"></i> Expanded</span></div>
+      <div id="trace" class="trace"></div>
+    </article>
+    <article class="panel">
+      <div class="panel-title"><div><b>05</b><h3>Complexity analysis</h3></div><span>THEORY</span></div>
+      <div class="complexity">
+        <div><label>WORST-CASE TIME</label><strong>O(2ⁿ)</strong><p>In the worst case, the algorithm may explore every include/exclude combination. Bounding can reduce the search in practice.</p></div>
+        <div><label>SPACE COMPLEXITY</label><strong>O(n)</strong><p>Depth-first recursion stores a path of at most n decisions, excluding the input and trace output.</p></div>
+      </div>
+      <p class="footnote">n = number of products. This implementation uses a fractional-knapsack upper bound after sorting by value-to-cost ratio. The bound is optimistic; products themselves remain indivisible (0/1 choices).</p>
+    </article>
+  </section>
+
+  <section class="how">
+    <div class="section-head"><div><b>06</b><h2>How the algorithm works</h2></div><small>0/1 KNAPSACK · BRANCH &amp; BOUND</small></div>
+    <div class="how-grid">
+      <div><b>01</b><h3>Sort</h3><p>Arrange products by value-to-cost ratio to calculate a useful upper bound.</p></div>
+      <div><b>02</b><h3>Branch</h3><p>For each product, create two choices: include it or exclude it.</p></div>
+      <div><b>03</b><h3>Bound</h3><p>Estimate the best possible value reachable from the current partial basket.</p></div>
+      <div><b>04</b><h3>Prune</h3><p>Stop exploring a branch if it exceeds the budget or cannot beat the best value.</p></div>
+    </div>
+  </section>
+  <footer><span>CARTWISE <b>·</b> DAA ASSIGNMENT 02</span><span>0/1 KNAPSACK / BRANCH AND BOUND</span></footer>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
